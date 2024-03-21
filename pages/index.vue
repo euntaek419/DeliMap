@@ -1,59 +1,49 @@
 <script setup>
-  import Main from './main/main.vue'
-  
-  const router = useRouter()
-  const goLogin = () => {
-    router.addRoute({ name: 'main', path: '/main', component: Main });
-    router.push('/main')
-  }
+import { onMounted } from 'vue';
+import Menu from './main/menu.vue'
 
+onMounted(() => {
+    let container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
+    let options = { //지도를 생성할 때 필요한 기본 옵션
+        center: new kakao.maps.LatLng(33.450701, 126.570667), //지도의 중심좌표.
+        level: 3 //지도의 레벨(확대, 축소 정도)
+    };
+
+    let map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+
+    let marker = new kakao.maps.Marker({
+        //지도 중심좌표에 마커를 생성합니다.
+        position: map.getCenter()
+    });
+
+    marker.setMap(map);
+
+    kakao.maps.event.addListener(map, 'click', function (mouseEvent) {
+        // 클릭한 위도, 경도 정보를 가져옵니다
+        let latlng = mouseEvent.latLng;
+
+        // 마커 위치를 클릭한 위치로 옮깁니다
+        marker.setPosition(latlng);
+
+        let message = '클릭한 위치의 위도는 ' + latlng.getLat() + ' 이고, ';
+        message += '경도는 ' + latlng.getLng() + ' 입니다';
+
+        console.log(message)
+    }, { passive: true }); //패시브 이벤트 핸들러로 설정
+});
 </script>
 
 <template>
-  <div class="wrapper">
-    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-      <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-        <img class="mx-auto h-10 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company">
-        <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">로그인</h2>
-      </div>
-
-      <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form class="space-y-6" action="#" method="POST">
-          <div>
-            <label for="email" class="block text-sm font-medium leading-6 text-gray-900">아이디</label>
-            <div class="mt-2">
-              <input id="email" name="email" type="email" autocomplete="email" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-            </div>
-          </div>
-
-          <div>
-            <div class="flex items-center justify-between">
-              <label for="password" class="block text-sm font-medium leading-6 text-gray-900">비밀번호</label>
-              <div class="text-sm">
-                <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">비밀번호를 까먹으셨나요?</a>
-              </div>
-            </div>
-            <div class="mt-2">
-              <input id="password" name="password" type="password" autocomplete="current-password" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-            </div>
-          </div>
-
-          <div>
-            <button type="submit" @click="goLogin" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">로그인</button>
-          </div>
-        </form>
-
-      </div>
-    </div>
+  <div>
+    <div id="map"></div>
+    <Menu />
   </div>
-
-
 </template>
-<style>
-.wrapper {
-    width: 80vw;
-    height: 100vh;
-    margin: 0 auto;
+
+<style scoped>
+#map{
+  width: 100vw;
+  height: 100vh;
 }
-    
+
 </style>
